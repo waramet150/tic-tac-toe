@@ -1,32 +1,44 @@
-import { getScore } from "@/utils/getScores";
-import { saveScore } from "@/utils/scoreService";
 import React, { useState, useEffect } from "react";
+import { updateScore } from "@/utils/scoreService";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const XOGame = ({ data }) => {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [isXTurn, setIsXTurn] = useState(true);
   const [winner, setWinner] = useState(null);
   const [isDraw, setIsDraw] = useState(false);
+  const [scoreData, setScoreData] = useState({ score: 0, streak: 0 });
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const initialScoreData = await updateScore(0);
+        setScoreData(initialScoreData);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const gameWinner = calculateWinner(board);
     if (gameWinner) {
       setWinner(gameWinner);
-      if (gameWinner === "X") {
-        saveScore(1); // เพิ่มคะแนนถ้าผู้เล่นชนะ
-      } else if (gameWinner === "O") {
-        saveScore(-1); // ลดคะแนนถ้าผู้เล่นแพ้
-      }
+      handleScoreUpdate(gameWinner === "X" ? 1 : -1);
     } else if (board.every((cell) => cell !== null)) {
-      saveScore(0); // ถ้าเสมอ
       setIsDraw(true);
+      handleScoreUpdate(0);
     }
   }, [board]);
 
+  const handleScoreUpdate = async (scoreChange) => {
+    const updatedScoreData = await updateScore(scoreChange);
+    setScoreData(updatedScoreData);
+  };
+
   const handleClick = (index) => {
-    if (!data || !data.auth) {
-      return;
-    }
+    if (!data || !data.auth) return;
 
     if (board[index] || winner || isDraw) return;
 
@@ -79,7 +91,10 @@ const XOGame = ({ data }) => {
   return (
     <div className="flex flex-col items-center justify-center mt-10">
       <h1 className="text-4xl font-bold mb-6">XO Game</h1>
-
+      <div className="mb-5">
+        <div>Score: {scoreData.score}</div>
+        <div>Win Streak: {scoreData.streak}</div>
+      </div>
       <div className="grid grid-cols-3 gap-4 mb-4">
         {board.map((cell, index) => (
           <button
@@ -111,15 +126,11 @@ const XOGame = ({ data }) => {
             onClick={resetGame}
             className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
           >
-            เริ่มเกมใหม่
+            Play Again
           </button>
         </div>
       )}
-      {!winner && !isDraw && (
-        <h2 className="text-lg font-medium text-gray-700">
-          {!data ? "" : `${isXTurn ? `Your Turn (X)` : ""}`}
-        </h2>
-      )}
+      <div className="mt-6 text-xl text-gray-800"></div>
     </div>
   );
 };

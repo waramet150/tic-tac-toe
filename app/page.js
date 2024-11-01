@@ -1,16 +1,13 @@
 "use client";
-// Home.js
-import GoogleLoginButton from "./loginButton";
+
 import XOGame from "@/components/XOGame";
-import LogoutButton from "./logoutButton";
+import LogoutButton from "../components/logoutButton";
 import { useState } from "react";
 import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "@/utils/firebase";
 
 export default function Home() {
   const [data, setData] = useState();
-
-  console.log("data", data);
 
   const handleGoogleLogin = async () => {
     try {

@@ -7,9 +7,7 @@ const LogoutButton = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      console.log("Logged out successfully");
       window.location.reload();
-      // อาจนำทางไปที่หน้า Login หรือหน้าหลักตามต้องการ
     } catch (error) {
       console.error("Logout Failed:", error.message);
     }

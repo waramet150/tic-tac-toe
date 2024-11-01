@@ -2,37 +2,39 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "./firebase";
 import { getAuth } from "firebase/auth";
 
-export const saveScore = async (scoreChange) => {
+export const updateScore = async (scoreChange) => {
   const auth = getAuth();
-  const userId = auth.currentUser.uid;
+  const userId = auth.currentUser ? auth.currentUser.uid : null;
+
+  if (!userId) {
+    console.log("User is not logged in.");
+    return { score: 0, streak: 0 };
+  }
 
   const scoreDocRef = doc(db, "scores", userId);
   const scoreDoc = await getDoc(scoreDocRef);
 
-  let newScore = 0;
-  let newStreak = 0;
-
-  // กำหนดค่าพื้นฐานให้กับ score และ streak
   let currentScore = 0;
   let currentStreak = 0;
 
   if (scoreDoc.exists()) {
     const data = scoreDoc.data();
-    currentScore = data.score || 0; // ถ้า score เป็น undefined ให้ใช้ 0
-    currentStreak = data.streak || 0; // ถ้า streak เป็น undefined ให้ใช้ 0
+    currentScore = data.score || 0;
+    currentStreak = data.streak || 0;
   }
 
-  newScore = currentScore + scoreChange;
-  newStreak = scoreChange > 0 ? currentStreak + 1 : 0; // ถ้าเป็นการชนะให้เพิ่มสแตค ถ้าแพ้ให้รีเซ็ตเป็น 0
+  let newScore = currentScore + scoreChange;
+  let newStreak = scoreChange > 0 ? currentStreak + 1 : 0;
 
   if (newStreak >= 3) {
-    newScore += 1; // เพิ่มคะแนนพิเศษ
-    newStreak = 0; // รีเซ็ตสแตค
+    newScore += 1;
+    newStreak = 0;
   }
 
-  // บันทึกข้อมูลใหม่
   await setDoc(scoreDocRef, {
     score: newScore,
     streak: newStreak,
   });
+
+  return { score: newScore, streak: newStreak };
 };

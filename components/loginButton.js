@@ -2,7 +2,7 @@
 import { auth, provider } from "@/utils/firebase";
 import { signInWithPopup } from "firebase/auth";
 import React, { useState } from "react";
-import LogoutButton from "./logoutButton";
+import LogoutButton from "../components/logoutButton";
 
 const GoogleLoginButton = () => {
   const [data, setData] = useState();
