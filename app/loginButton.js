@@ -1,13 +1,10 @@
-"use client";
-// Home.js
-import GoogleLoginButton from "./loginButton";
-import XOGame from "@/components/XOGame";
-import LogoutButton from "./logoutButton";
-import { useState } from "react";
-import { signInWithPopup } from "firebase/auth";
+// GoogleLoginButton.js
 import { auth, provider } from "@/utils/firebase";
+import { signInWithPopup } from "firebase/auth";
+import React, { useState } from "react";
+import LogoutButton from "./logoutButton";
 
-export default function Home() {
+const GoogleLoginButton = () => {
   const [data, setData] = useState();
 
   console.log("data", data);
@@ -24,14 +21,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
-      <h1 className="text-4xl font-bold mb-6">Welcome to XO Game</h1>
-
-      <h2 className="flex mb-5">
-        {data
-          ? `Welcome ${data.displayName}`
-          : "Please Log in before play the game"}
-      </h2>
+    <>
       {!data ? (
         <button
           onClick={handleGoogleLogin}
@@ -42,8 +32,9 @@ export default function Home() {
       ) : (
         <LogoutButton />
       )}
-
-      <XOGame data={data} />
-    </div>
+      {/* <h2>{data ? `Welcome ${data.displayName}` : ""}</h2> */}
+    </>
   );
-}
+};
+
+export default GoogleLoginButton;

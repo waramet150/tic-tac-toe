@@ -38,3 +38,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+
+tic-tac-toe-99190-firebase-adminsdk-sx0fy-fe21399c0f.js
